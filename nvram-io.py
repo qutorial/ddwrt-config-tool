@@ -14,6 +14,7 @@ def parseArgs():
   parser.add_argument('-out', help="nvram file to write output to")
   parser.add_argument('-adminpasswd', help="change admin password", action='store_true')
   parser.add_argument('-wifipasswd', help="change wifi password", action='store_true')
+  parser.add_argument('-apisolation', help="enable AP Isolation", action='store_true')
   parser.add_argument('--verbose', '-v', action='count')
   parser.add_argument('--print', '-p', help="print out the new configuration", action='store_true')
   args = parser.parse_args()
@@ -132,6 +133,12 @@ def changeWifiPasswords(nvram, internal, external, byod):
   nvram['ath1.1_wpa_psk'] = '%s' % external
   nvram['ath0_wpa_psk'] = '%s' % internal
 
+def enableApIsolation(nvram):
+  nvram['ath1.1_ap_isolate'] = '1' #external
+  nvram['ath1.1_isolation'] = '1'
+  nvram['ath1.2_ap_isolate'] = '1' #byod
+  nvram['ath1.2_isolation'] = '1'
+
 def main():
   global logger
   args = parseArgs()
@@ -162,6 +169,9 @@ def main():
     external = getpass("External password: ")
     byod = getpass("BYOD password: ")
     changeWifiPasswords(nvram, internal, external, byod)
+
+  if args.apisolation:
+    enableApIsolation(nvram)
 
   if args.print:
     for k,v in nvram.items():
