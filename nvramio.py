@@ -4,12 +4,16 @@ import logging
 import argparse
 import struct
 from getpass import getpass
+import io
+import pyAesCrypt
+import json
+from os import stat
 
 logger = False
 
 def parseArgs():
   parser = argparse.ArgumentParser(description='Tool to read DD-WRT NVRAM files')
-  parser.add_argument('nvram', help="nvram file to read and work on")
+  parser.add_argument('-nvram', help="nvram file to read and work on")
   parser.add_argument('-rename', type=int, help="new router name as a number, e.g. 33")
   parser.add_argument('-out', help="nvram file to write output to")
   parser.add_argument('-adminpasswd', help="change admin password", action='store_true')
@@ -17,6 +21,9 @@ def parseArgs():
   parser.add_argument('-apisolation', help="enable AP Isolation", action='store_true')
   parser.add_argument('--verbose', '-v', action='count')
   parser.add_argument('--print', '-p', help="print out the new configuration", action='store_true')
+  parser.add_argument('--storewifi', help="store WiFi passwords", action='store_true')
+  parser.add_argument('--showwifi', help="store WiFi passwords", action='store_true')
+  parser.add_argument('--wifisettings', help="file with WiFi passwords")
   args = parser.parse_args()
   return args
 
@@ -34,6 +41,45 @@ def getLogger(args):
   logger.addHandler(ch)
   return logger
 
+############ ENCRYPTED STORAGE OF SETTINGS ####################
+
+bufferSize = 64 * 1024
+
+def writeSettingsToFile(settings, filename, password):
+  global bufferSize
+  settingsStr = json.dumps(settings).encode('utf-8')
+  fIn = io.BytesIO(settingsStr)
+  with open(filename, "wb") as fOut:
+    pyAesCrypt.encryptStream(fIn, fOut, password, bufferSize)
+
+def readSettingsFromFile(filename, password):
+  global bufferSize
+  with open(filename, "rb") as fIn:
+    fOut = io.BytesIO()
+    size = stat(filename).st_size
+    pyAesCrypt.decryptStream(fIn, fOut, password, bufferSize, size)
+    fJson = io.StringIO(fOut.getvalue().decode('utf-8'))
+    return json.load(fJson)
+
+def storeWiFiSettings(filename):
+  print("About to save WiFi passwords in %s" % filename)
+  password = getpass("Please, provide password to encrypt the settings: ")
+  internal = getpass("Please, provide Internal PSK: ")
+  external = getpass("Please, provide External PSK: ")
+  byod = getpass("Please, provide BYOD PSK: ")
+  settings = { 'internal': internal, 'external': external, 'byod': byod }
+  writeSettingsToFile(settings, filename, password)
+
+def readWiFiSettingsUI(filename):
+  password = getpass("Please, provide password to decrypt the WiFi settings: ")
+  settings = readSettingsFromFile(filename, password)
+  return settings
+def showWiFiSettings(filename):
+  settings = readWiFiSettingsUI(filename)
+  for k, v in settings.items():
+    print("%s = '%s'" %(k, v))
+
+############## READING AND WRITING NVRAM FILES ################
 
 def readNAsciiBytes(f, n):
   key = f.read(n).decode('ascii')
@@ -105,6 +151,8 @@ def writeNvram(filename, nvram):
       writeKeyVal(f, (k, v) )
   return True
 
+############## NVRAM Manipulations ################
+
 def renameRouter(nvram, name):
   # changing names and ssids
   nvram['wan_hostname'] = 'mozaiq%s' % name
@@ -139,6 +187,7 @@ def enableApIsolation(nvram):
   nvram['ath1.2_ap_isolate'] = '1' #byod
   nvram['ath1.2_isolation'] = '1'
 
+##################### MAIN ######################
 def main():
   global logger
   args = parseArgs()
@@ -146,11 +195,23 @@ def main():
   logger = getLogger(args)
   logger.info("NVRAM tool started")
 
-  if not args.print and args.out is None:
-    logger.error("Please specify -p to print or an -out file")
+  if not args.print and args.out is None and not args.storewifi and not args.showwifi:
+    logger.error("Please, specify -p to print or an -out file or --storewifi or --showwifi")
     return
 
+  if args.storewifi or args.showwifi:
+    if args.wifisettings is None:
+      logger.error("Please specify --wifisettings file")
+      return
+    if args.storewifi:
+      storeWiFiSettings(args.wifisettings)
+    elif args.showwifi:
+      showWiFiSettings(args.wifisettings)
+    return
 
+  if args.nvram is None:
+    logger.error("For these settings you need to specify -nvram file, please")
+    return
 
   nvram = readNvram(args.nvram)
   if nvram == False:
@@ -163,11 +224,14 @@ def main():
     passwd = getpass("\nPlease, input a new admin password: ")
     changeAdminPassword(nvram, passwd)
 
-  if args.wifipasswd:
-    print("\nPlease, provide WiFi passwords here")
-    internal = getpass("Internal password: ")
-    external = getpass("External password: ")
-    byod = getpass("BYOD password: ")
+  if args.wifipasswd and args.wifisettings is None:
+    logger.error("Please, provide --wifisettings file if you wish to change wifi passwords. Create one with --storewifi.")
+    return
+  elif args.wifipasswd:
+    settings = readWiFiSettingsUI(args.wifisettings)
+    internal = settings['internal']
+    external = settings['external']
+    byod = settings['byod']
     changeWifiPasswords(nvram, internal, external, byod)
 
   if args.apisolation:
@@ -180,6 +244,7 @@ def main():
   if args.out is not None:
     writeNvram(args.out, nvram)
 
+  logger.info("Done")
 
 
 if __name__ == "__main__":

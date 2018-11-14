@@ -9,5 +9,5 @@ Usage
 ## Installation
 
 If you are changing admin password, you'll need
-passlib. Install it using pip or run install.sh.
+passlib and pyAesCrypt. Install it using pip or run install.sh.
 

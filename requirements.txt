@@ -1,2 +1,4 @@
 passlib==1.7.1
+pyAesCrypt==0.4.2
+
 
