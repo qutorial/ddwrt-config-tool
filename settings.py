@@ -25,25 +25,3 @@ def readSettingsFromFile(filename, password):
     pyAesCrypt.decryptStream(fIn, fOut, password, bufferSize, size)
     fJson = io.StringIO(fOut.getvalue().decode('utf-8'))
     return json.load(fJson)
-
-
-def readWiFiSettingsUI(filename):
-  password = getpass("Please, provide password to decrypt the WiFi settings: ")
-  settings = readSettingsFromFile(filename, password)
-  return settings
-
-def showWiFiSettings(filename):
-  settings = readWiFiSettingsUI(filename)
-  for k, v in settings.items():
-    print("%s = '%s'" %(k, v))
-
-### mozaiq specific ###
-def storeWiFiSettings(filename):
-  print("About to save WiFi passwords in %s" % filename)
-  password = getpass("Please, provide password to encrypt the settings: ")
-  internal = getpass("Please, provide Internal PSK: ")
-  external = getpass("Please, provide External PSK: ")
-  byod = getpass("Please, provide BYOD PSK: ")
-  settings = { 'internal': internal, 'external': external, 'byod': byod }
-  writeSettingsToFile(settings, filename, password)
-
