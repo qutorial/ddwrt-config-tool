@@ -62,7 +62,7 @@ def main():
   parser.add_argument('--apisolation', '-i', help="enable AP Isolation", action='store_true')
   parser.add_argument('--print', '-p', help="print out the new configuration", action='store_true')
   parser.add_argument('--wifipasswords', '-w', help="file with WiFi passwords")
-  parser.add_argument('--clearwifipaswords', '-c', help='erase WiFi PSKs from nvram')
+  parser.add_argument('--clearwifipaswords', '-c', help='erase WiFi PSKs from nvram', action='store_true')
   args = parseArgs(parser)
   
   # set up logging
@@ -86,12 +86,17 @@ def main():
     passwd = getpass("\nPlease, input a new admin password: ")
     changeAdminPassword(nvram, passwd)
 
-  if args.wifipasswords:
+  if args.wifipasswords and not args.clearwifipaswords:
     settings = readWiFiPasswordsUI(args.wifipasswords)
     internal = settings['internal']
     external = settings['external']
     byod = settings['byod']
     changeWifiPasswords(nvram, internal, external, byod)
+  elif args.clearwifipaswords:
+    clearWiFiPsks(nvram)
+  else:
+    logger.error("Please, either clear PSKs or change them from file: -c or -w")
+    return
 
   if args.apisolation:
     enableApIsolation(nvram)
