@@ -86,7 +86,10 @@ def main():
     passwd = getpass("\nPlease, input a new admin password: ")
     changeAdminPassword(nvram, passwd)
 
-  if args.wifipasswords and not args.clearwifipaswords:
+  if args.wifipasswords and args.clearwifipasswords:
+    logger.error("Please, either clear PSKs or change them from file: -c or -w")
+    return
+  elif args.wifipasswords:
     settings = readWiFiPasswordsUI(args.wifipasswords)
     internal = settings['internal']
     external = settings['external']
@@ -94,9 +97,6 @@ def main():
     changeWifiPasswords(nvram, internal, external, byod)
   elif args.clearwifipaswords:
     clearWiFiPsks(nvram)
-  else:
-    logger.error("Please, either clear PSKs or change them from file: -c or -w")
-    return
 
   if args.apisolation:
     enableApIsolation(nvram)

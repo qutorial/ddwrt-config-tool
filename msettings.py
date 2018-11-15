@@ -35,11 +35,8 @@ def main():
   logger = getLogger(args)
   if args.storewifi:
     storeWiFiPasswords(args.wifipasswords)
-  elif args.showwifi:
-    showWiFiPasswords(args.wifipasswords)
   else:
-    logger.error("Please, select --storewifi or --showwifi")
-    return
+    showWiFiPasswords(args.wifipasswords)
 
 if __name__ == "__main__":
   main()
