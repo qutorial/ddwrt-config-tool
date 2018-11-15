@@ -4,10 +4,8 @@ from nvramlogging import getLogger
 from nvramargs import getParser, parseArgs
 from ddwrtnvram import readNvram, writeNvram
 from msettings import readWiFiPasswordsUI
+from getpass import getpass
 
-
-
-  
 ####### mozaiq-specific NVRAM Manipulations #######
 
 def renameRouter(nvram, name):
@@ -62,15 +60,15 @@ def main():
   parser.add_argument('--apisolation', '-i', help="enable AP Isolation", action='store_true')
   parser.add_argument('--print', '-p', help="print out the new configuration", action='store_true')
   parser.add_argument('--wifipasswords', '-w', help="file with WiFi passwords")
-  parser.add_argument('--clearwifipaswords', '-c', help='erase WiFi PSKs from nvram', action='store_true')
+  parser.add_argument('--clearwifipasswords', '-c', help='erase WiFi PSKs from nvram', action='store_true')
   args = parseArgs(parser)
-  
+
   # set up logging
   logger = getLogger(args)
 
   # choose what to do based on args, continue
   logger.info("NVRAM tool started")
-  
+
   if not args.print and args.out is None:
     logger.error("Please, specify -p to print or an -out file")
     return
@@ -95,7 +93,7 @@ def main():
     external = settings['external']
     byod = settings['byod']
     changeWifiPasswords(nvram, internal, external, byod)
-  elif args.clearwifipaswords:
+  elif args.clearwifipasswords:
     clearWiFiPsks(nvram)
 
   if args.apisolation:
