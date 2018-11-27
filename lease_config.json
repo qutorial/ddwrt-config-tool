@@ -1,0 +1,25 @@
+{
+  "static_leases": {
+    "user1": {
+      "hostname": "vinod",
+      "mac_address": "00:28:f8:43:f6:11",
+      "ip_address": "192.168.35.44",
+      "lease_time": "300"
+    },
+
+    "user2": {
+      "hostname": "vinod",
+      "mac_address": "00:28:f8:43:f6:11",
+      "ip_address": "192.168.135.66",
+      "lease_time": "500"
+    },
+     "user3": {
+      "hostname": "vinod",
+      "mac_address": "00:28:f8:43:f6:11",
+      "ip_address": "192.168.235.88",
+      "lease_time": "500"
+    }
+
+  }
+}
+
