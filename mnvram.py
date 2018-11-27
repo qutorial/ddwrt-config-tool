@@ -5,6 +5,7 @@ from nvramargs import getParser, parseArgs
 from ddwrtnvram import readNvram, writeNvram
 from msettings import readWiFiPasswordsUI
 from getpass import getpass
+import json
 
 ####### mozaiq-specific NVRAM Manipulations #######
 
@@ -21,6 +22,7 @@ def renameRouter(nvram, name):
   nvram['ath1.1_ipaddr'] = '192.168.1%s.1' % name
   nvram['ath1.2_ipaddr'] = '192.168.2%s.1' % name
   nvram['lan_ipaddr'] = '192.168.%s.1' % name
+
 
 def hashPassword(password):
   from passlib.hash import md5_crypt
@@ -48,6 +50,34 @@ def enableApIsolation(nvram):
   nvram['ath1.2_ap_isolate'] = '1' #byod
   nvram['ath1.2_isolation'] = '1'
 
+
+def add_staticLease(nvram, leaseSettingsFile, router_id):                  # define a new method to add the static Lease
+  with open("lease_config.json") as f:
+    tmpl = json.load(f)
+
+  static_leases = tmpl['static_leases']
+  entries = []
+  for hostname in static_leases:
+    lease_details = static_leases[hostname]
+    ip_addr = lease_details['ip_address'].split('.')
+    third_octet = int(ip_addr[2])
+    if third_octet >= 200:
+      third_octet = str(200+router_id)
+    elif 100 <= third_octet < 199:
+      third_octet = str(100+router_id)
+    else:
+      third_octet = str(router_id)
+    ip_addr[2] = third_octet
+    lease_details['ip_address'] = ".".join(ip_addr)
+    entry = lease_details['mac_address'] + "=" + lease_details['hostname'] + "=" + lease_details['ip_address'] + "=" + \
+            lease_details['lease_time']
+    print(entry)
+    entries.append(entry)
+
+  final_text = " ".join(entries)
+  nvram['static_leases'] = final_text
+
+
 ################### TOOL UI #########################
 
 def main():
@@ -61,6 +91,7 @@ def main():
   parser.add_argument('--print', '-p', help="print out the new configuration", action='store_true')
   parser.add_argument('--wifipasswords', '-w', help="file with WiFi passwords")
   parser.add_argument('--clearwifipasswords', '-c', help='erase WiFi PSKs from nvram', action='store_true')
+  parser.add_argument('--add_static_lease', '-sl', help='include new static leases into nvram')
   args = parseArgs(parser)
 
   # set up logging
@@ -74,6 +105,12 @@ def main():
     return
 
   nvram = readNvram(args.nvram, logger)
+  with open("text_settings.txt", "w") as fout:
+    for key,values in nvram.items():
+      data = str(key) + " " + str(values) + "\n"
+      if(str(key)=='static_leases'):
+        print(type(values))
+      fout.write(data)
   if nvram == False:
     return
 
@@ -99,6 +136,9 @@ def main():
   if args.apisolation:
     enableApIsolation(nvram)
 
+  if args.add_static_lease:
+    add_staticLease(nvram, args.add_static_lease, args.rename)
+
   if args.print:
     for k,v in nvram.items():
       print("%s = '%s'" % (k,v))
@@ -107,6 +147,8 @@ def main():
     writeNvram(args.out, nvram, logger)
 
   logger.info("Done")
+
+
 
 
 if __name__ == "__main__":
