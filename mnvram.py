@@ -11,10 +11,10 @@ from getpass import getpass
 def renameRouter(nvram, name):
   # changing names and ssids
   nvram['wan_hostname'] = 'mozaiq%s' % name
-  nvram['ath2_ssid'] = 'mozaiq%s' % name
+  nvram['ath2_ssid'] = 'mozaiq%s-5ghz-2' % name
   nvram['ath1_ssid'] = 'mozaiq%s' % name
   nvram['ath1.2_ssid'] = 'mozaiq-byod-%s' % name
-  nvram['ath0_ssid'] = 'mozaiq%s' % name
+  nvram['ath0_ssid'] = 'mozaiq%s-5ghz' % name
   nvram['ath1.1_ssid'] = 'mozaiq-external-%s' % name
   nvram['router_name'] = 'mozaiq%s' % name
   # changing ip addresses
