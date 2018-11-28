@@ -105,12 +105,6 @@ def main():
     return
 
   nvram = readNvram(args.nvram, logger)
-  with open("text_settings.txt", "w") as fout:
-    for key,values in nvram.items():
-      data = str(key) + " " + str(values) + "\n"
-      if(str(key)=='static_leases'):
-        print(type(values))
-      fout.write(data)
   if nvram == False:
     return
 
