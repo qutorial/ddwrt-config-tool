@@ -38,9 +38,14 @@ optional arguments:
 
 ## Installation
 
-If you are changing admin password, you'll need
-passlib and pyAesCrypt. Install it using pip or run install.sh.
+Please, run the installation script as a sudoer:
 
+```sudo -H ./install.sh```
+
+The `-H` flag is important for pip3 to work well.
+
+It installs the necessary packages with apt and 
+builds a virtualenv for python for this tool.
 
 
 

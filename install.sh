@@ -15,7 +15,6 @@ getpkg build-essential
 getpkg libssl-dev
 getpkg libffi-dev
 getpkg python3
-#getpkg python3-dev
 getpkg python3-pip
 getpkg virtualenv
 getpkg python3-virtualenv
@@ -31,8 +30,8 @@ fi
 
 # Check the version of python
 python_version=`python3 --version`
-required_version="Python 3.6.6"
-if [[ "$python_version" != "$required_version" ]];
+required_version="Python 3.6.*"
+if [[ "$python_version" != $required_version ]];
 then
   echo "Please, install $required_version on your system and then try again"
   exit 1
@@ -51,5 +50,10 @@ pip3 install -r requirements.txt
 if [[ "$?" -ne 0 ]];
 then
   echo "Failed to install python requirements"
+  echo "Try reinstalling pip: sudo python3 -m pip uninstall pip && sudo apt install python3-pip --reinstall"
   exit 3
 fi
+
+echo "Installation finished successfully"
+exit 0
+

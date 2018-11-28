@@ -1,3 +1,5 @@
+return 0
+
 if [[ -d venv ]];
 then
   . venv/bin/activate
