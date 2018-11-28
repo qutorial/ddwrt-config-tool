@@ -38,15 +38,15 @@ optional arguments:
 
 ## Installation
 
-Please, run the installation script as a sudoer:
+Please, run:
 
-```sudo -H ./install.sh```
-
-The `-H` flag is important for pip3 to work well.
+```make install```
 
 It installs the necessary packages with apt and 
 builds a virtualenv for python for this tool.
 
+Use `source activate.sh` to have the right python environment
+when using the tool.
 
 
 ## Developer
