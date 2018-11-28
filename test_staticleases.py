@@ -5,5 +5,5 @@ import unittest
 
 class TestStaticLeases(unittest.TestCase):
 
-  def test_one_sentence(self):
+  def test_static_leases(self):
     self.assertTrue(True)
