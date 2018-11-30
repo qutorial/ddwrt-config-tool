@@ -14,3 +14,9 @@ def getLogger(args):
   ch.setFormatter(formatter)
   logger.addHandler(ch)
   return logger
+
+def getTestLogger():
+  logger = logging.getLogger('test')
+  logger.setLevel(logging.ERROR)
+  return logger
+
