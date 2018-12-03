@@ -42,6 +42,11 @@ Please, run:
 
 ```make install```
 
+or 
+
+```make install-dev``` - for a developer version
+
+
 It installs the necessary packages with apt and 
 builds a virtualenv for python for this tool.
 

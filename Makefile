@@ -11,6 +11,9 @@ prior:
 install:
 	sudo -H ./install.sh
 
+install-dev:
+	sudo -H ./install.sh dev
+
 test-static-leases:
 	( \
 	  source ./activate.sh; \
