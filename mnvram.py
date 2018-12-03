@@ -49,7 +49,7 @@ def enableApIsolation(nvram):
 
 
 def add_staticLease(nvram, leaseSettingsFile, router_id):                  # define a new method to add the static Lease
-  with open("lease_config.json") as f:
+  with open(leaseSettingsFile) as f:
     tmpl = json.load(f)
 
   static_leases = tmpl['static_leases']
