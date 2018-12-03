@@ -5,23 +5,24 @@ from nvramargs import getParser, parseArgs
 from ddwrtnvram import readNvram, writeNvram
 from msettings import readWiFiPasswordsUI
 from getpass import getpass
+from router import Router
 import json
 
 ####### mozaiq-specific NVRAM Manipulations #######
 
 def renameRouter(nvram, name):
+  router = Router(nvram)
   # changing names and ssids
-  nvram['wan_hostname'] = 'mozaiq%s' % name
-  nvram['ath2_ssid'] = 'mozaiq%s-5ghz-2' % name
-  nvram['ath1_ssid'] = 'mozaiq%s' % name
-  nvram['ath1.2_ssid'] = 'mozaiq-byod-%s' % name
-  nvram['ath0_ssid'] = 'mozaiq%s-5ghz' % name
-  nvram['ath1.1_ssid'] = 'mozaiq-external-%s' % name
-  nvram['router_name'] = 'mozaiq%s' % name
+  router.nvram['ath2_ssid'] = 'mozaiq%s-5ghz-2' % name
+  router.nvram['ath1_ssid'] = 'mozaiq%s' % name
+  router.nvram['ath1.2_ssid'] = 'mozaiq-byod-%s' % name
+  router.nvram['ath0_ssid'] = 'mozaiq%s-5ghz' % name
+  router.nvram['ath1.1_ssid'] = 'mozaiq-external-%s' % name
   # changing ip addresses
-  nvram['ath1.1_ipaddr'] = '192.168.1%s.1' % name
-  nvram['ath1.2_ipaddr'] = '192.168.2%s.1' % name
-  nvram['lan_ipaddr'] = '192.168.%s.1' % name
+  router.nvram['ath1.1_ipaddr'] = '192.168.1%s.1' % name
+  router.nvram['ath1.2_ipaddr'] = '192.168.2%s.1' % name
+  router.nvram['lan_ipaddr'] = '192.168.%s.1' % name
+  router.name = 'mozaiq%s' % name
 
 
 def hashPassword(password):
