@@ -6,7 +6,7 @@ function getpkg() {
   thepackage=$1
   if [ `apt -qq list "$thepackage" 2>/dev/null | grep installed | wc -l` -eq "0" ]; then
     echo "$thepackage was not found. Installing..."
-    sudo apt-get install "$thepackage" || { echo "Package $thepackage could not be installed!"; exit 10; }
+    apt-get install "$thepackage" || { echo "Package $thepackage could not be installed!"; exit 10; }
   fi
 }
 
@@ -47,7 +47,7 @@ fi
 
 . activate.sh
 
-pip3 install -r requirements.txt
+./venv/bin/python3 -m pip install -r requirements.txt
 if [[ "$?" -ne 0 ]];
 then
   echo "Failed to install python requirements"
@@ -57,7 +57,7 @@ fi
 
 if [[ $1 == "dev" ]];
 then
-  pip3 install -r dev_requirements.txt
+  ./venv/bin/python3 -m pip  install -r dev_requirements.txt
   if [[ "$?" -ne 0 ]];
   then
     echo "Failed to install developer python requirements"

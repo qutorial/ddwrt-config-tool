@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!./venv/bin/python3
 
 from nvramlogging import getLogger
 from nvramargs import getParser, parseArgs
@@ -24,13 +24,9 @@ def renameRouter(nvram, name):
   router.nvram['lan_ipaddr'] = '192.168.%s.1' % name
   router.name = 'mozaiq%s' % name
 
-
-def hashPassword(password):
-  from passlib.hash import md5_crypt
-  return md5_crypt.using(salt_size=8).hash(password)
-
 def changeAdminPassword(nvram, password):
-  nvram['http_passwd'] = hashPassword(password)
+  router = Router(nvram)
+  router.password = password
 
 def changeWifiPasswords(nvram, internal, external, byod):
   nvram['ath2_wpa_psk'] = '%s' % internal

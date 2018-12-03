@@ -1,3 +1,5 @@
+#!./venv/bin/python3
+
 class Router:
 
   def __init__(self, nvram={}):
@@ -27,4 +29,18 @@ class Router:
   def name(self, value):
     self.router_name = value
     self.wan_hostname = value
+  
+  @property
+  def password(self):
+    return self.nvram['http_passwd']
+  
+  @password.setter
+  def password(self, value):
+    self.nvram['http_passwd'] = Router.hashPassword(value)
+  
+  @staticmethod
+  def hashPassword(password):
+    from passlib.hash import md5_crypt
+    return md5_crypt.using(salt_size=8).hash(password)
+
 

@@ -25,3 +25,8 @@ class TestRouter(unittest.TestCase):
     self.assertTrue(router.wan_hostname == "hostname")
     self.assertTrue(router.nvram['wan_hostname'] == "hostname")
 
+  def test_passwd(self):
+    from passlib.hash import md5_crypt
+    router = Router()
+    router.password = "HellYeah!"
+    self.assertTrue(md5_crypt.verify("HellYeah!", router.nvram['http_passwd']))

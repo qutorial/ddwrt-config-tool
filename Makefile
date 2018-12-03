@@ -9,7 +9,7 @@ prior:
 	@echo "Default target is running all tests!"
 
 install:
-	./install.sh
+	sudo -H ./install.sh
 
 test-static-leases:
 	( \
