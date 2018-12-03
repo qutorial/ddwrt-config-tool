@@ -83,12 +83,12 @@ def main():
   parser.add_argument('nvram', help="input nvram file")
   parser.add_argument('--rename', '-r', type=int, help="new router name as a number, e.g. 33")
   parser.add_argument('--out', '-o', help="nvram file to write output to")
-  parser.add_argument('--adminpasswd', '-a', help="change admin password", action='store_true')
-  parser.add_argument('--apisolation', '-i', help="enable AP Isolation", action='store_true')
+  parser.add_argument('--admin-passwd', '-a', help="change admin password", action='store_true')
+  parser.add_argument('--ap-isolation', '-i', help="enable AP Isolation", action='store_true')
   parser.add_argument('--print', '-p', help="print out the new configuration", action='store_true')
-  parser.add_argument('--wifipasswords', '-w', help="file with WiFi passwords")
-  parser.add_argument('--clearwifipasswords', '-c', help='erase WiFi PSKs from nvram', action='store_true')
-  parser.add_argument('--add_static_lease', '-sl', help='include new static leases into nvram')
+  parser.add_argument('--wifi-passwords', '-w', help="file with WiFi passwords")
+  parser.add_argument('--clear-wifi-passwords', '-c', help='erase WiFi PSKs from nvram', action='store_true')
+  parser.add_argument('--add-static-lease', '-sl', help='include new static leases into nvram')
   args = parseArgs(parser)
 
   # set up logging
