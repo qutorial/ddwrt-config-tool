@@ -1,5 +1,7 @@
 #!./venv/bin/python3
 
+from lease import Lease
+
 class Router:
 
   def __init__(self, nvram={}):
@@ -42,5 +44,42 @@ class Router:
   def hashPassword(password):
     from passlib.hash import md5_crypt
     return md5_crypt.using(salt_size=8).hash(password)
+  
+  @staticmethod
+  def normalizeLeases(leases):
+    res = {}
+    for l in leases:
+      res[l.hostname] = l
+    return res.values()
+  
+  @property
+  def leases(self):
+    leases = []
+    if len(self.nvram['static_leases']) > 0:
+      for l in self.nvram['static_leases'].split(' '):
+        lease = Lease()
+        if lease.fromStr(l):
+          leases += [lease]
+        elif len(l) > 1:
+          raise Exception("Couldn't parse lease: %s" % l)
+    return leases
 
+  @leases.setter
+  def leases(self, leases):
+    self.nvram['static_leases'] = Router.leasesToStr(Router.normalizeLeases(leases))
+    self.nvram['static_leasenum'] = str(len(self.leases))
 
+  @staticmethod
+  def leasesToStr(leases):
+    return "".join(map(lambda l: str(l), leases))
+  
+  def leasesStr(self):
+    return Router.leasesToStr(self.leases)
+  
+  def addLease(self, lease):
+    self.leases += [lease]
+  
+  def clearWiFiPsks(self):
+    for k, v in self.nvram.items():
+      if k.endswith('wpa_psk'):
+        self.nvram[k] = ''

@@ -5,3 +5,5 @@ __pycache__
 nvrambins
 venv
 .vscode
+*.swp
+*.kate-swp

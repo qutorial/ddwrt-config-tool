@@ -36,9 +36,8 @@ def changeWifiPasswords(nvram, internal, external, byod):
   nvram['ath0_wpa_psk'] = '%s' % internal
 
 def clearWiFiPsks(nvram):
-  for k, v in nvram.items():
-    if k.endswith('wpa_psk'):
-      nvram[k] = ''
+  router = Router(nvram)
+  router.clearWiFiPsks()
 
 
 def enableApIsolation(nvram):
@@ -48,11 +47,15 @@ def enableApIsolation(nvram):
   nvram['ath1.2_isolation'] = '1'
 
 
-def add_staticLease(nvram, leaseSettingsFile, router_id):                  # define a new method to add the static Lease
-  with open(leaseSettingsFile) as f:
-    tmpl = json.load(f)
+def addStaticLease(nvram, leaseSettingsFile, router_id):                  # define a new method to add the static Lease
+  router = Router(nvram)
+  if router_id is None:
+    router_id = router.name[-2:] # two last letters of hopefully mozaiqXY router
 
-  static_leases = tmpl['static_leases']
+  with open(leaseSettingsFile) as f:
+    leasesFileJson = json.load(f)
+
+  static_leases = leasesFileJson['static_leases']
   entries = []
   for hostname in static_leases:
     lease_details = static_leases[hostname]
@@ -88,7 +91,7 @@ def main():
   parser.add_argument('--print', '-p', help="print out the new configuration", action='store_true')
   parser.add_argument('--wifi-passwords', '-w', help="file with WiFi passwords")
   parser.add_argument('--clear-wifi-passwords', '-c', help='erase WiFi PSKs from nvram', action='store_true')
-  parser.add_argument('--add-static-lease', '-sl', help='include new static leases into nvram')
+  parser.add_argument('--add-static-leases', '-sl', help='include new static leases into nvram')
   args = parseArgs(parser)
 
   # set up logging
@@ -108,27 +111,27 @@ def main():
   if args.rename is not None:
     renameRouter(nvram, args.rename)
 
-  if args.adminpasswd:
+  if args.admin_passwd:
     passwd = getpass("\nPlease, input a new admin password: ")
     changeAdminPassword(nvram, passwd)
 
-  if args.wifipasswords and args.clearwifipasswords:
+  if args.wifi_passwords and args.clear_wifi_passwords:
     logger.error("Please, either clear PSKs or change them from file: -c or -w")
     return
-  elif args.wifipasswords:
+  elif args.wifi_passwords:
     settings = readWiFiPasswordsUI(args.wifipasswords)
     internal = settings['internal']
     external = settings['external']
     byod = settings['byod']
     changeWifiPasswords(nvram, internal, external, byod)
-  elif args.clearwifipasswords:
+  elif args.clear_wifi_passwords:
     clearWiFiPsks(nvram)
 
-  if args.apisolation:
+  if args.ap_isolation:
     enableApIsolation(nvram)
 
-  if args.add_static_lease:
-    add_staticLease(nvram, args.add_static_lease, args.rename)
+  if args.add_static_leases:
+    add_staticLease(nvram, args.add_static_leases, args.rename)
 
   if args.print:
     for k,v in nvram.items():
