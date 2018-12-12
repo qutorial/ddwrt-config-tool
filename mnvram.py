@@ -51,31 +51,8 @@ def addStaticLease(nvram, leaseSettingsFile, router_id):                  # defi
   router = Router(nvram)
   if router_id is None:
     router_id = router.name[-2:] # two last letters of hopefully mozaiqXY router
+  router.modifyThirdOctet(leaseSettingsFile, router_id)
 
-  with open(leaseSettingsFile) as f:
-    leasesFileJson = json.load(f)
-
-  static_leases = leasesFileJson['static_leases']
-  entries = []
-  for hostname in static_leases:
-    lease_details = static_leases[hostname]
-    ip_addr = lease_details['ip_address'].split('.')
-    third_octet = int(ip_addr[2])
-    if third_octet >= 200:
-      third_octet = str(200+router_id)
-    elif 100 <= third_octet < 199:
-      third_octet = str(100+router_id)
-    else:
-      third_octet = str(router_id)
-    ip_addr[2] = third_octet
-    lease_details['ip_address'] = ".".join(ip_addr)
-    entry = lease_details['mac_address'] + "=" + lease_details['hostname'] + "=" + lease_details['ip_address'] + "=" + \
-            lease_details['lease_time']
-    print(entry)
-    entries.append(entry)
-
-  final_text = " ".join(entries)
-  nvram['static_leases'] = final_text
 
 
 ################### TOOL UI #########################
@@ -119,7 +96,7 @@ def main():
     logger.error("Please, either clear PSKs or change them from file: -c or -w")
     return
   elif args.wifi_passwords:
-    settings = readWiFiPasswordsUI(args.wifipasswords)
+    settings = readWiFiPasswordsUI(args.wifi_passwords)
     internal = settings['internal']
     external = settings['external']
     byod = settings['byod']
@@ -131,7 +108,7 @@ def main():
     enableApIsolation(nvram)
 
   if args.add_static_leases:
-    add_staticLease(nvram, args.add_static_leases, args.rename)
+    addStaticLease(nvram, args.add_static_leases, args.rename)
 
   if args.print:
     for k,v in nvram.items():
