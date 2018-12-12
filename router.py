@@ -1,6 +1,8 @@
 #!./venv/bin/python3
 
 from lease import Lease
+from read_leases import readLeases
+
 
 class Router:
 
@@ -50,7 +52,7 @@ class Router:
     res = {}
     for l in leases:
       res[l.hostname] = l
-    return res.values()
+    return sorted(res.values(),key=lambda x: x.hostname)
   
   @property
   def leases(self):
@@ -78,8 +80,25 @@ class Router:
   
   def addLease(self, lease):
     self.leases += [lease]
-  
+
   def clearWiFiPsks(self):
     for k, v in self.nvram.items():
       if k.endswith('wpa_psk'):
         self.nvram[k] = ''
+
+  def modifyThirdOctet(self, leaseSettingsFile, router_id):
+    leaseList = readLeases(leaseSettingsFile)
+    for leaseObject in leaseList:
+      ip_addr = leaseObject.ip_address.split('.')
+      third_octet = int(ip_addr[2])
+      if third_octet >= 200:
+        third_octet = str(200 + router_id)
+      elif 100 <= third_octet < 199:
+        third_octet = str(100 + router_id)
+      else:
+        third_octet = str(router_id)
+      ip_addr[2] = third_octet
+
+      leaseObject.ip_address = ".".join(ip_addr)
+    for lease in leaseList:
+        self.addLease(lease)

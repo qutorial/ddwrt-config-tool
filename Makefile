@@ -3,7 +3,7 @@ SHELL := /bin/bash
 
 default: prior test
 
-test: test-static-leases test-settings-coding test-nvram-coding test-mnvram test-router test-lease test-leases-router
+test: test-static-leases test-settings-coding test-nvram-coding test-mnvram test-router test-lease test-leases-router test-add-static-lease test-read-leases
 
 prior:
 	@echo "Default target is running all tests!"
@@ -54,6 +54,18 @@ test-leases-router:
 	( \
 	  source ./activate.sh; \
 	  /usr/bin/env 	python3 -m unittest test_leases_router.TestLeasesRouter; \
+	)
+
+test-add-static-lease:
+	( \
+	  source ./activate.sh; \
+	  /usr/bin/env 	python3 -m unittest test_add_static_lease.TestAddStaticLease; \
+	)
+
+test-read-leases:
+	( \
+	  source ./activate.sh; \
+	  /usr/bin/env 	python3 -m unittest test_read_leases.TestReadLeases; \
 	)
 
 # When adding tests - Do Not Forget to extend the all-tests target
