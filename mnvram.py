@@ -47,12 +47,33 @@ def enableApIsolation(nvram):
   nvram['ath1.2_isolation'] = '1'
 
 
-def addStaticLease(nvram, leaseSettingsFile, router_id):                  # define a new method to add the static Lease
+def addStaticLease(nvram, leaseSettingsFile):                  # define a new method to add the static Lease
   router = Router(nvram)
-  if router_id is None:
-    router_id = router.name[-2:] # two last letters of hopefully mozaiqXY router
-  router.modifyThirdOctet(leaseSettingsFile, router_id)
+  router.addLeasesFromFile(leaseSettingsFile)
 
+
+def updateLeaseIps(nvram, router_id):
+  router = Router(nvram)
+  leaseObjects = router.leases
+  if len(leaseObjects) > 0 :
+    for leaseObject in  leaseObjects:
+      modifyLeaseObject(leaseObject, router_id)
+
+  router.leases = leaseObjects
+
+def modifyLeaseObject(leaseObject, router_id):
+  ip_addr = leaseObject.ip_address.split('.')
+  third_octet = int(ip_addr[2])
+  if third_octet >= 200:
+    third_octet = str(200 + router_id)
+  elif 100 <= third_octet < 199:
+    third_octet = str(100 + router_id)
+  else:
+    third_octet = str(router_id)
+  ip_addr[2] = third_octet
+
+  leaseObject.ip_address = ".".join(ip_addr)
+  return leaseObject
 
 
 ################### TOOL UI #########################
@@ -108,7 +129,9 @@ def main():
     enableApIsolation(nvram)
 
   if args.add_static_leases:
-    addStaticLease(nvram, args.add_static_leases, args.rename)
+    addStaticLease(nvram, args.add_static_leases)
+
+  updateLeaseIps(nvram, args.rename)
 
   if args.print:
     for k,v in nvram.items():
@@ -118,8 +141,6 @@ def main():
     writeNvram(args.out, nvram, logger)
 
   logger.info("Done")
-
-
 
 
 if __name__ == "__main__":
