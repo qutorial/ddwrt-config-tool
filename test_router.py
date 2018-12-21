@@ -53,7 +53,6 @@ class TestRouter(unittest.TestCase):
     self.assertEqual(leases[0].hostname, "printer")
     self.assertEqual(leases[1].hostname, "raspberrypi")
     self.assertEqual(leases[2].hostname, "raspberrypi2")
-    print("LEASES STR IS: " + router.leasesStr())
     self.assertEqual(router.leasesStr(), "AA:BB:F8:43:F6:DD=printer=192.168.235.88=500 B8:27:EB:5E:9C:C0=raspberrypi=192.168.23.41=3600 B8:27:EB:5E:9C:C1=raspberrypi2=192.168.23.42=3601 ")
 
     # now write, read and then retest
