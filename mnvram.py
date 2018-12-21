@@ -10,71 +10,69 @@ import json
 
 ####### mozaiq-specific NVRAM Manipulations #######
 
-def renameRouter(nvram, name):
-  router = Router(nvram)
-  # changing names and ssids
-  router.nvram['ath2_ssid'] = 'mozaiq%s-5ghz-2' % name
-  router.nvram['ath1_ssid'] = 'mozaiq%s' % name
-  router.nvram['ath1.2_ssid'] = 'mozaiq-byod-%s' % name
-  router.nvram['ath0_ssid'] = 'mozaiq%s-5ghz' % name
-  router.nvram['ath1.1_ssid'] = 'mozaiq-external-%s' % name
-  # changing ip addresses
-  router.nvram['ath1.1_ipaddr'] = '192.168.1%s.1' % name
-  router.nvram['ath1.2_ipaddr'] = '192.168.2%s.1' % name
-  router.nvram['lan_ipaddr'] = '192.168.%s.1' % name
-  router.name = 'mozaiq%s' % name
+class MozaiqRouter(Router):
 
-def changeAdminPassword(nvram, password):
-  router = Router(nvram)
-  router.password = password
+  def __init__(self, nvram={}):
+    super(MozaiqRouter, self).__init__(nvram)
 
-def changeWifiPasswords(nvram, internal, external, byod):
-  nvram['ath2_wpa_psk'] = '%s' % internal
-  nvram['ath1.2_wpa_psk'] = '%s' % byod
-  nvram['ath1_wpa_psk'] = '%s' % internal
-  nvram['ath1.1_wpa_psk'] = '%s' % external
-  nvram['ath0_wpa_psk'] = '%s' % internal
+  def renameRouter(self, name):
+    # changing names and ssids
+    self.nvram['ath2_ssid'] = 'mozaiq%s-5ghz-2' % name
+    self.nvram['ath1_ssid'] = 'mozaiq%s' % name
+    self.nvram['ath1.2_ssid'] = 'mozaiq-byod-%s' % name
+    self.nvram['ath0_ssid'] = 'mozaiq%s-5ghz' % name
+    self.nvram['ath1.1_ssid'] = 'mozaiq-external-%s' % name
+    # changing ip addresses
+    self.nvram['ath1.1_ipaddr'] = '192.168.1%s.1' % name
+    self.nvram['ath1.2_ipaddr'] = '192.168.2%s.1' % name
+    self.nvram['lan_ipaddr'] = '192.168.%s.1' % name
+    self.name = 'mozaiq%s' % name
 
-def clearWiFiPsks(nvram):
-  router = Router(nvram)
-  router.clearWiFiPsks()
+  def changeAdminPassword(self, password):
+    self.password = password
 
+  def changeWifiPasswords(self, internal, external, byod):
+    self.nvram['ath2_wpa_psk'] = '%s' % internal
+    self.nvram['ath1.2_wpa_psk'] = '%s' % byod
+    self.nvram['ath1_wpa_psk'] = '%s' % internal
+    self.nvram['ath1.1_wpa_psk'] = '%s' % external
+    self.nvram['ath0_wpa_psk'] = '%s' % internal
 
-def enableApIsolation(nvram):
-  nvram['ath1.1_ap_isolate'] = '1' #external
-  nvram['ath1.1_isolation'] = '1'
-  nvram['ath1.2_ap_isolate'] = '1' #byod
-  nvram['ath1.2_isolation'] = '1'
+  def eraseWiFiPsks(self):
+    self.clearWiFiPsks()
 
+  def enableApIsolation(self):
+    self.nvram['ath1.1_ap_isolate'] = '1' #external
+    self.nvram['ath1.1_isolation'] = '1'
+    self.nvram['ath1.2_ap_isolate'] = '1' #byod
+    self.nvram['ath1.2_isolation'] = '1'
 
-def addStaticLease(nvram, leaseSettingsFile):                  # define a new method to add the static Lease
-  router = Router(nvram)
-  router.addLeasesFromFile(leaseSettingsFile)
+  def addStaticLease(self, leaseSettingsFile):
+    self.addLeasesFromFile(leaseSettingsFile)
 
+  def updateLeaseIps(self, router_id):
+    leaseObjects = self.leases
+    if len(leaseObjects) > 0 :
+      for leaseObject in leaseObjects:
+        self.modifyLeaseObject(leaseObject, router_id)
 
-def updateLeaseIps(nvram, router_id):
-  router = Router(nvram)
-  leaseObjects = router.leases
-  if len(leaseObjects) > 0 :
-    for leaseObject in  leaseObjects:
-      modifyLeaseObject(leaseObject, router_id)
+    self.leases = leaseObjects
 
-  router.leases = leaseObjects
+  @staticmethod
+  def modifyLeaseObject(leaseObject, router_id):
 
-def modifyLeaseObject(leaseObject, router_id):
-  ip_addr = leaseObject.ip_address.split('.')
-  third_octet = int(ip_addr[2])
-  if third_octet >= 200:
-    third_octet = str(200 + router_id)
-  elif 100 <= third_octet < 199:
-    third_octet = str(100 + router_id)
-  else:
-    third_octet = str(router_id)
-  ip_addr[2] = third_octet
+    ip_addr = leaseObject.ip_address.split('.')
+    third_octet = int(ip_addr[2])
+    if third_octet >= 200:
+      third_octet = str(200 + router_id)
+    elif 100 <= third_octet < 199:
+      third_octet = str(100 + router_id)
+    else:
+      third_octet = str(router_id)
+    ip_addr[2] = third_octet
 
-  leaseObject.ip_address = ".".join(ip_addr)
-  return leaseObject
-
+    leaseObject.ip_address = ".".join(ip_addr)
+    return leaseObject
 
 ################### TOOL UI #########################
 
@@ -106,12 +104,14 @@ def main():
   if nvram == False:
     return
 
+  router = MozaiqRouter(nvram)
+
   if args.rename is not None:
-    renameRouter(nvram, args.rename)
+    router.renameRouter(args.rename)
 
   if args.admin_passwd:
     passwd = getpass("\nPlease, input a new admin password: ")
-    changeAdminPassword(nvram, passwd)
+    router.changeAdminPassword(passwd)
 
   if args.wifi_passwords and args.clear_wifi_passwords:
     logger.error("Please, either clear PSKs or change them from file: -c or -w")
@@ -121,17 +121,17 @@ def main():
     internal = settings['internal']
     external = settings['external']
     byod = settings['byod']
-    changeWifiPasswords(nvram, internal, external, byod)
+    router.changeWifiPasswords(internal, external, byod)
   elif args.clear_wifi_passwords:
-    clearWiFiPsks(nvram)
+    router.eraseWiFiPsks()
 
   if args.ap_isolation:
-    enableApIsolation(nvram)
+    router.enableApIsolation()
 
   if args.add_static_leases:
-    addStaticLease(nvram, args.add_static_leases)
+    router.addStaticLease(args.add_static_leases)
 
-  updateLeaseIps(nvram, args.rename)
+  router.updateLeaseIps(args.rename)
 
   if args.print:
     for k,v in nvram.items():
@@ -141,7 +141,6 @@ def main():
     writeNvram(args.out, nvram, logger)
 
   logger.info("Done")
-
 
 if __name__ == "__main__":
   main()
