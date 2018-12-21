@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/qutorial/ddwrt-config-tool.svg?branch=master)](https://travis-ci.org/qutorial/ddwrt-config-tool)
+
 # DD-WRT configuration tool for mozaiq
 
 Usage
