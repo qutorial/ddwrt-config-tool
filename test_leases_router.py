@@ -28,5 +28,5 @@ class TestLeasesRouter(unittest.TestCase):
     self.assertEqual(len(router.leases), 3)
     self.assertEqual(router.nvram['static_leasenum'],  '3')
     s = router.leasesStr()
-    shouldBe = "B8:27:EB:5E:9C:C0=raspberrypi=192.168.23.41=3600 B8:27:EB:5E:9C:C1=raspberrypi2=192.168.23.42=3601 AA:BB:F8:43:F6:DD=host1=192.168.235.88=500 "
+    shouldBe = "AA:BB:F8:43:F6:DD=host1=192.168.235.88=500 B8:27:EB:5E:9C:C0=raspberrypi=192.168.23.41=3600 B8:27:EB:5E:9C:C1=raspberrypi2=192.168.23.42=3601 "
     self.assertEqual(s, shouldBe)

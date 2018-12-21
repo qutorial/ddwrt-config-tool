@@ -30,7 +30,7 @@ class TestRouter(unittest.TestCase):
     router = Router()
     router.password = "HellYeah!"
     self.assertTrue(md5_crypt.verify("HellYeah!", router.nvram['http_passwd']))
-  
+
   def test_leases(self):
     from ddwrtnvram import readNvram, writeNvram
     from nvramlogging import getTestLogger
@@ -50,11 +50,12 @@ class TestRouter(unittest.TestCase):
     leases = router.leases
     self.assertEqual(len(leases), 3)
     self.assertEqual(router.nvram['static_leasenum'], '3')
-    self.assertEqual(leases[0].hostname, "raspberrypi")
-    self.assertEqual(leases[1].hostname, "raspberrypi2")
-    self.assertEqual(leases[2].hostname, "printer")
-    self.assertEqual(router.leasesStr(), "B8:27:EB:5E:9C:C0=raspberrypi=192.168.23.41=3600 B8:27:EB:5E:9C:C1=raspberrypi2=192.168.23.42=3601 AA:BB:F8:43:F6:DD=printer=192.168.235.88=500 ")
-    
+    self.assertEqual(leases[0].hostname, "printer")
+    self.assertEqual(leases[1].hostname, "raspberrypi")
+    self.assertEqual(leases[2].hostname, "raspberrypi2")
+    print("LEASES STR IS: " + router.leasesStr())
+    self.assertEqual(router.leasesStr(), "AA:BB:F8:43:F6:DD=printer=192.168.235.88=500 B8:27:EB:5E:9C:C0=raspberrypi=192.168.23.41=3600 B8:27:EB:5E:9C:C1=raspberrypi2=192.168.23.42=3601 ")
+
     # now write, read and then retest
     writeNvram('./test/test.static.leases.router.bin', router.nvram, logger)
     nvram = readNvram ('./test/test.static.leases.router.bin', logger)
@@ -62,10 +63,8 @@ class TestRouter(unittest.TestCase):
     leases = router.leases
     self.assertEqual(len(leases), 3)
     self.assertEqual(router.nvram['static_leasenum'], '3')
-    self.assertEqual(leases[0].hostname, "raspberrypi")
-    self.assertEqual(leases[1].hostname, "raspberrypi2")
-    self.assertEqual(leases[2].hostname, "printer")
-    
-    
+    self.assertEqual(leases[1].hostname, "raspberrypi")
+    self.assertEqual(leases[2].hostname, "raspberrypi2")
+    self.assertEqual(leases[0].hostname, "printer")
 
 
