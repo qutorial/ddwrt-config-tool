@@ -90,3 +90,17 @@ class Router:
     leaseList = readLeases(leaseSettingsFile)
     for lease in leaseList:
         self.addLease(lease)
+
+  def changeSshdStatus(self, status):
+    if status:
+      self.nvram['sshd_enable'] = '1'
+      self.nvram['sshd_wanport'] = '22'
+      self.nvram['sshd_port'] = '22'
+      self.nvram['sshd_passwd_auth'] =  '1'
+      self.nvram['sshd_authorized_keys'] = ''
+      self.nvram['sshd_forwarding'] = '0'
+    else:
+      self.nvram['sshd_enable'] = '0'
+
+
+
