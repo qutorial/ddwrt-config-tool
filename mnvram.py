@@ -94,7 +94,7 @@ def main():
   parser.add_argument('--wifi-passwords', '-w', help="file with WiFi passwords")
   parser.add_argument('--clear-wifi-passwords', '-c', help='erase WiFi PSKs from nvram', action='store_true')
   parser.add_argument('--add-static-leases', '-sl', help='include new static leases into nvram')
-  parser.add_argument('--sshd', help='sshd enable(true)/disable(false)/donot-change', default=None)
+  parser.add_argument('--sshd', help=' enable/disable sshd', default=None)
   args = parseArgs(parser)
 
   # set up logging
