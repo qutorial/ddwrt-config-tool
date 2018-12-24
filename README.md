@@ -1,4 +1,5 @@
-[![Build Status](https://api.travis-ci.com/vinodramachandra/ddwrt-config-tool-1.svg?branch=master)](https://travis-ci.com/vinodramachandra/ddwrt-config-tool-1)
+[![Build Status](https://travis-ci.com/vinodramachandra/ddwrt-config-tool-1.svg?branch=feature%2FEnableDisableSSHD)](https://travis-ci.com/vinodramachandra/ddwrt-config-tool-1)
+
 # DD-WRT configuration tool for mozaiq
  
 Usage
