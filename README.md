@@ -1,5 +1,4 @@
-[![Build Status](https://api.travis-ci.com/qutorial/ddwrt-config-tool.svg?branch=master)](https://travis-ci.com/qutorial/ddwrt-config-tool)
-
+[![Build Status](https://api.travis-ci.com/vinodramachandra/ddwrt-config-tool-1.svg?branch=master)](https://travis-ci.com/vinodramachandra/ddwrt-config-tool-1)
 # DD-WRT configuration tool for mozaiq
 
 Usage
