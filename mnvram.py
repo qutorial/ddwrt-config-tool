@@ -74,6 +74,12 @@ class MozaiqRouter(Router):
     leaseObject.ip_address = ".".join(ip_addr)
     return leaseObject
 
+  def updateSshd(self, newState):
+      if newState == 'enable':
+          self.changeSshdStatus(True)
+      else:
+          self.changeSshdStatus(False)
+
 ################### TOOL UI #########################
 
 def main():
@@ -88,6 +94,7 @@ def main():
   parser.add_argument('--wifi-passwords', '-w', help="file with WiFi passwords")
   parser.add_argument('--clear-wifi-passwords', '-c', help='erase WiFi PSKs from nvram', action='store_true')
   parser.add_argument('--add-static-leases', '-sl', help='include new static leases into nvram')
+  parser.add_argument('--sshd', help=' enable/disable sshd', default=None)
   args = parseArgs(parser)
 
   # set up logging
@@ -106,8 +113,12 @@ def main():
 
   router = MozaiqRouter(nvram)
 
+  if args.add_static_leases:
+    router.addStaticLease(args.add_static_leases)
+
   if args.rename is not None:
     router.renameRouter(args.rename)
+    router.updateLeaseIps(args.rename)
 
   if args.admin_passwd:
     passwd = getpass("\nPlease, input a new admin password: ")
@@ -128,10 +139,8 @@ def main():
   if args.ap_isolation:
     router.enableApIsolation()
 
-  if args.add_static_leases:
-    router.addStaticLease(args.add_static_leases)
-
-  router.updateLeaseIps(args.rename)
+  if args.sshd is not None:
+    router.updateSshd(args.sshd)
 
   if args.print:
     for k,v in nvram.items():

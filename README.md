@@ -1,11 +1,11 @@
 [![Build Status](https://api.travis-ci.com/qutorial/ddwrt-config-tool.svg?branch=master)](https://travis-ci.com/qutorial/ddwrt-config-tool)
 
 # DD-WRT configuration tool for mozaiq
-
+ 
 Usage
 
 ```
-./mnvram.py triband.30.bin -r 33 --apisolation --adminpasswd -w mozaiq.wifi.enc -o 33.bin -sl lease_config.json
+./mnvram.py triband.30.bin -r 33 --apisolation --adminpasswd -w mozaiq.wifi.enc -o 33.bin -sl lease_config.json --sshd enable
 
 ```
 
@@ -73,5 +73,7 @@ settings.py - library to read and write encrypted setttings including wifi passw
 test - some test scripts   
 triband.30.bin - request this file - it is a standard WRT3200ACM configuration for mozaiq   
 lease_config.json - static dhcp allocation user config details
+
+
 
 
