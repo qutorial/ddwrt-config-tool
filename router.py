@@ -2,6 +2,7 @@
 
 from lease import Lease
 from read_leases import readLeases
+from read_sshd_config import readSshdSettings
 
 
 class Router:
@@ -91,16 +92,58 @@ class Router:
     for lease in leaseList:
         self.addLease(lease)
 
-  def changeSshdStatus(self, status):
-    if status:
+  def changeSshdStatus(self, enableSshd):
+    if enableSshd:
       self.nvram['sshd_enable'] = '1'
-      self.nvram['sshd_wanport'] = '22'
       self.nvram['sshd_port'] = '22'
-      self.nvram['sshd_passwd_auth'] =  '1'
+      self.nvram['sshd_passwd_auth'] = '0'
       self.nvram['sshd_authorized_keys'] = ''
       self.nvram['sshd_forwarding'] = '0'
     else:
       self.nvram['sshd_enable'] = '0'
+
+  def enableWanSsh(self, enableRemoteAccess, wanPort=22):
+    if enableRemoteAccess:
+      self.nvram['remote_mgt_ssh'] = '1'
+      self.nvram['sshd_wanport'] = str(wanPort)
+    else:
+      self.nvram['remote_mgt_ssh'] = '0'
+
+  def addSshKey(self, sshKey):
+    sshKey += '\n'
+    self.nvram['sshd_authorized_keys'] += sshKey
+
+  def addSshKeys(self, sshKeys):
+    for key in sshKeys:
+      self.addSshKey(key)
+
+  def enableSshKeyAuth(self, authorizedKeys):
+    if len(authorizedKeys):
+      self.addSshKeys(authorizedKeys)
+
+  def handleSshdSettings(self, sshSettingsFile):
+    sshdSettings = readSshdSettings(sshSettingsFile)
+
+    if sshdSettings['sshd_status'] == 'enable':
+      self.changeSshdStatus(True)
+      if sshdSettings['wan_port_ssh_remote_access'] == 'enable':
+        self.enableWanSsh(enableRemoteAccess=True, wanPort=sshdSettings['ssh_wan_port_number'])
+      else:
+        self.enableWanSsh(enableRemoteAccess=False)
+
+      self.enableSshKeyAuth(sshdSettings['authorized_keys'])
+
+    elif sshdSettings['sshd_status'] == 'disable':
+      self.changeSshdStatus(False)
+
+
+
+
+
+
+
+
+
 
 
 

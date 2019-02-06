@@ -5,14 +5,16 @@
 Usage
 
 ```
-./mnvram.py triband.30.bin -r 33 --apisolation --adminpasswd -w mozaiq.wifi.enc -o 33.bin -sl lease_config.json --sshd enable
+
+./mnvram.py triband.30.bin -r 33 --apisolation --adminpasswd -w mozaiq.wifi.enc -o 33.bin -sl lease_config.json --sshd sshd_config.json
+
 
 ```
 
 This means take triband.30.bin configuration file for the 30 router, rename it to be 33 router,
 introduce Acess Point Isolation, change admin passwords for web UI, set wifi passwords from the 
 mozaiq.wifi.enc encrypted file and write the result to 33.bin. DHCP performs static IP address 
-allocation for users in lease_config.json
+allocation for users in lease_config.json. SSH is enabled or disabled based on the flags set in the sshd_config.json
 
 See `./mnvram.py -h` for help.
 
@@ -73,6 +75,7 @@ settings.py - library to read and write encrypted setttings including wifi passw
 test - some test scripts   
 triband.30.bin - request this file - it is a standard WRT3200ACM configuration for mozaiq   
 lease_config.json - static dhcp allocation user config details
+sshd_config.json - SSH configuration details like ssh enable/disable, enable/disable ssh remote access, ssh wan port number, ssh auth keys. 
 
 
 

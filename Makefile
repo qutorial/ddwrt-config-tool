@@ -3,7 +3,7 @@ SHELL := /bin/bash
 
 default: prior test
 
-test: test-static-leases test-settings-coding test-nvram-coding test-mnvram test-router test-lease test-leases-router test-add-static-lease test-read-leases test-sshd
+test: test-static-leases test-settings-coding test-nvram-coding test-mnvram test-router test-lease test-leases-router test-add-static-lease test-read-leases test-read-sshd-config
 
 prior:
 	@echo "Default target is running all tests!"
@@ -68,10 +68,10 @@ test-read-leases:
 	  /usr/bin/env 	python3 -m unittest test_read_leases.TestReadLeases; \
 	)
 
-test-sshd:
+test-read-sshd-config:
 	( \
 	  source ./activate.sh; \
-	  /usr/bin/env 	python3 -m unittest test_sshd.TestSSHD; \
+	  /usr/bin/env 	python3 -m unittest test_read_sshd_config.TestReadSshdConfig; \
 	)
 
 

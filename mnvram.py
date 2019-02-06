@@ -74,11 +74,10 @@ class MozaiqRouter(Router):
     leaseObject.ip_address = ".".join(ip_addr)
     return leaseObject
 
-  def updateSshd(self, newState):
-      if newState == 'enable':
-          self.changeSshdStatus(True)
-      else:
-          self.changeSshdStatus(False)
+  def updateSshd(self, sshSettingsFile):
+    self.handleSshdSettings(sshSettingsFile)
+
+
 
 ################### TOOL UI #########################
 
@@ -94,7 +93,7 @@ def main():
   parser.add_argument('--wifi-passwords', '-w', help="file with WiFi passwords")
   parser.add_argument('--clear-wifi-passwords', '-c', help='erase WiFi PSKs from nvram', action='store_true')
   parser.add_argument('--add-static-leases', '-sl', help='include new static leases into nvram')
-  parser.add_argument('--sshd', help=' enable/disable sshd', default=None)
+  parser.add_argument('--sshd', help='enable/disable sshd using the configuration file', default=None)
   args = parseArgs(parser)
 
   # set up logging
